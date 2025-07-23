@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-EmporioApplication<emporio>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.mobiledev.emporio.EmporioApplication",
+            "projectName": "emporio",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
