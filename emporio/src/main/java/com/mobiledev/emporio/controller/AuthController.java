@@ -38,7 +38,7 @@ public class AuthController {
             String errorMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
             return ResponseEntity.badRequest().body(new AuthError(errorMsg));
         }
-        service.register(user.getUsername(), user.getPassword());
+        service.register(user.getEmail(), user.getPassword());
         return ResponseEntity.ok(jwt.generateToken("BUYER"));
     }
 
@@ -48,9 +48,9 @@ public class AuthController {
             String errorMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
             return ResponseEntity.badRequest().body(new AuthError(errorMsg));
         }
-        if (service.authenticate(user.getUsername(), user.getPassword())) {
-            String accessToken = jwt.generateToken(user.getUsername());
-            String refreshToken = jwt.generateRefreshToken(user.getUsername());
+        if (service.authenticate(user.getEmail(), user.getPassword())) {
+            String accessToken = jwt.generateToken(user.getEmail());
+            String refreshToken = jwt.generateRefreshToken(user.getEmail());
             return ResponseEntity.ok(Map.of("accessToken", accessToken, "refreshToken", refreshToken));
         } else {
             return ResponseEntity.status(401).body(new AuthError("Invalid credentials"));

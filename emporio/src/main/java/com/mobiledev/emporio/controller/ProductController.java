@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mobiledev.emporio.dto.CategoryProductDto;
+import com.mobiledev.emporio.dto.DealDto;
+import com.mobiledev.emporio.dto.CreateProductRequest;
 import com.mobiledev.emporio.model.Category;
 import com.mobiledev.emporio.model.Product;
 import com.mobiledev.emporio.model.Role;
@@ -54,8 +58,8 @@ public class ProductController {
     private JwtUtil jwtUtil;
 
     @GetMapping("/deals")
-    public List<Product> getDeals() {
-        return productRepository.findByOnDealTrue();
+    public List<DealDto> getDeals() {
+        return productService.getDealDtos();
     }
 
     @PostMapping("/{productId}/upload-images")
@@ -87,12 +91,23 @@ public class ProductController {
     }
 
     @GetMapping("/by-category/{categoryId}")
-    public List<Product> getProductsByCategory(@PathVariable Long categoryId) {
+    public List<CategoryProductDto> getProductsByCategory(@PathVariable Long categoryId) {
         Category category = categoryRepository.findById(categoryId).orElse(null);
         if (category == null) return List.of();
         return productRepository.findAll().stream()
             .filter(p -> p.getCategory() != null && p.getCategory().getId().equals(categoryId))
-            .toList();
+            .map(product -> {
+                CategoryProductDto dto = new CategoryProductDto();
+                dto.setId(product.getId());
+                dto.setName(product.getName());
+                dto.setImage(product.getImageUrls() != null && !product.getImageUrls().isEmpty() ? product.getImageUrls().get(0) : null);
+                dto.setPrice(product.getPrice() != null ? String.format("$%.2f", product.getPrice()) : null);
+                dto.setDiscountPrice(product.getDiscountPrice() != null ? String.format("$%.2f", product.getDiscountPrice()) : null);
+                dto.setDescription(product.getDescription());
+                dto.setInStock(product.getStock() != null && product.getStock() > 0);
+                return dto;
+            })
+            .collect(Collectors.toList());
     }
 
     @GetMapping("/by-tag")
@@ -103,28 +118,29 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createProduct(@Valid @RequestBody Product product, @RequestParam Long userId, @RequestParam(required = false) Long categoryId, @RequestParam(required = false) List<String> tags, HttpServletRequest request, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            String errorMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
-            return ResponseEntity.badRequest().body(new ApiError(errorMsg));
-        }
-        User user = userRepository.findById(userId).orElse(null);
+    public ResponseEntity<?> createProduct(@RequestBody CreateProductRequest req) {
+        User user = userRepository.findById(req.getUserId()).orElse(null);
         if (user == null || user.getRole() != Role.SELLER) {
             return ResponseEntity.status(403).body(new ApiError("Only sellers can create products."));
         }
-        String authUsername = jwtUtil.extractUsernameFromRequest(request);
-        if (authUsername == null || !authUsername.equals(user.getUsername())) {
-            return ResponseEntity.status(403).body(new ApiError("Access denied: You can only create products as yourself."));
-        }
-        if (categoryId != null) {
-            Category category = categoryRepository.findById(categoryId).orElse(null);
+        Product product = new Product();
+        product.setName(req.getName());
+        product.setDescription(req.getDescription());
+        product.setPrice(req.getPrice());
+        product.setStock(req.getStock());
+        product.setSeller(user);
+        if (req.getCategoryId() != null) {
+            Category category = categoryRepository.findById(req.getCategoryId()).orElse(null);
             product.setCategory(category);
         }
-        if (tags != null) {
-            product.setTags(tags);
+        if (req.getImageUrls() != null) {
+            product.setImageUrls(req.getImageUrls());
         }
-        product.setSeller(user);
-        return ResponseEntity.ok(productService.createProduct(product, user));
+        if (req.getTags() != null) {
+            product.setTags(req.getTags());
+        }
+        productRepository.save(product);
+        return ResponseEntity.ok(product);
     }
 
     @PutMapping("/{productId}")
@@ -190,3 +206,4 @@ class ApiError {
     public ApiError(String error) { this.error = error; }
     public String getError() { return error; }
 }
+

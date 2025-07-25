@@ -7,6 +7,7 @@ public class ReviewRequest {
     @NotNull
     private Long reviewerId;
     private Long revieweeId; // nullable for app reviews
+    private Long productId; // nullable for non-product reviews
     @NotNull
     private Integer rating;
     @Size(min = 1, max = 1000)
@@ -17,6 +18,8 @@ public class ReviewRequest {
     public void setReviewerId(Long reviewerId) { this.reviewerId = reviewerId; }
     public Long getRevieweeId() { return revieweeId; }
     public void setRevieweeId(Long revieweeId) { this.revieweeId = revieweeId; }
+    public Long getProductId() { return productId; }
+    public void setProductId(Long productId) { this.productId = productId; }
     public Integer getRating() { return rating; }
     public void setRating(Integer rating) { this.rating = rating; }
     public String getComment() { return comment; }

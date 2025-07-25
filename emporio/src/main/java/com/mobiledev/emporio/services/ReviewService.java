@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 
 import com.mobiledev.emporio.dto.ReviewRequest;
 import com.mobiledev.emporio.dto.ReviewResponse;
+import com.mobiledev.emporio.model.Product;
 import com.mobiledev.emporio.model.Review;
 import com.mobiledev.emporio.model.User;
+import com.mobiledev.emporio.repositories.ProductRepository;
 import com.mobiledev.emporio.repositories.ReviewRepository;
 import com.mobiledev.emporio.repositories.UserRepository;
 
@@ -20,6 +22,8 @@ public class ReviewService {
     private ReviewRepository reviewRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ProductRepository productRepository;
 
     public ReviewResponse submitReview(ReviewRequest req) {
         Review review = new Review();
@@ -27,7 +31,13 @@ public class ReviewService {
         review.setReviewee(req.getRevieweeId() != null ? userRepository.findById(req.getRevieweeId()).orElse(null) : null);
         review.setRating(req.getRating());
         review.setComment(req.getComment());
-        review.setType(req.getType());
+        if (req.getProductId() != null) {
+            Product product = productRepository.findById(req.getProductId()).orElse(null);
+            review.setProduct(product);
+            review.setType("PRODUCT");
+        } else {
+            review.setType(req.getType());
+        }
         review.setStatus("PENDING");
         review.setCreatedAt(LocalDateTime.now());
         review = reviewRepository.save(review);
@@ -62,6 +72,25 @@ public class ReviewService {
         review.setStatus("REJECTED");
         review = reviewRepository.save(review);
         return toResponse(review);
+    }
+
+    public double getAverageRatingForProduct(Long productId) {
+        List<Review> reviews = reviewRepository.findByProductIdAndTypeAndStatus(productId, "PRODUCT", "APPROVED");
+        if (reviews == null || reviews.isEmpty()) return 0.0;
+        double sum = 0.0;
+        int count = 0;
+        for (Review r : reviews) {
+            if (r.getRating() != null) {
+                sum += r.getRating();
+                count++;
+            }
+        }
+        return count == 0 ? 0.0 : sum / count;
+    }
+
+    public int getReviewCountForProduct(Long productId) {
+        List<Review> reviews = reviewRepository.findByProductIdAndTypeAndStatus(productId, "PRODUCT", "APPROVED");
+        return reviews == null ? 0 : reviews.size();
     }
 
     private ReviewResponse toResponse(Review review) {

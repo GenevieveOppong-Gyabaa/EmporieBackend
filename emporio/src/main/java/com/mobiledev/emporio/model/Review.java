@@ -22,6 +22,8 @@ public class Review {
     private String type; // "APP" or "SELLER"
     private String status; // "PENDING", "APPROVED", "REJECTED"
     private LocalDateTime createdAt;
+    @ManyToOne
+    private Product product;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -39,4 +41,6 @@ public class Review {
     public void setStatus(String status) { this.status = status; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public Product getProduct() { return product; }
+    public void setProduct(Product product) { this.product = product; }
 } 
