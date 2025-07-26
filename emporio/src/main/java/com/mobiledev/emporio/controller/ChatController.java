@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mobiledev.emporio.dto.ApiError;
 import com.mobiledev.emporio.model.ChatMessage;
 import com.mobiledev.emporio.model.User;
 import com.mobiledev.emporio.repositories.UserRepository;
@@ -180,10 +181,4 @@ public class ChatController {
         all.sort(java.util.Comparator.comparing(ChatMessage::getTimestamp));
         return ResponseEntity.ok(all);
     }
-}
-
-class ApiError {
-    private String error;
-    public ApiError(String error) { this.error = error; }
-    public String getError() { return error; }
 }

@@ -36,6 +36,17 @@ public class UserService {
         repo.save(user);
     }
 
+    public void registerAdmin(String username, String password) {
+        if (repo.findByUsername(username) != null) {
+            throw new RuntimeException("Username already taken");
+        }
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(encoder.encode(password));
+        user.setRole(Role.ADMIN); // Assign ADMIN role
+        repo.save(user);
+    }
+
     public boolean authenticate(String email, String password) {
         User user = repo.findByEmail(email);
         return user != null && encoder.matches(password, user.getPassword());

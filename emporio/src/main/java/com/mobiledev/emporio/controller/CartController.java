@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mobiledev.emporio.dto.AddCartItemRequest;
 import com.mobiledev.emporio.dto.CartDto;
+import com.mobiledev.emporio.dto.ApiError;
 import com.mobiledev.emporio.dto.UpdateCartItemRequest;
 import com.mobiledev.emporio.exceptions.CartItemNotFoundException;
 import com.mobiledev.emporio.exceptions.InvalidCartOperationException;
@@ -91,13 +92,3 @@ public class CartController {
         return ResponseEntity.ok("Cart cleared");
     }
 }
-
-class ApiError {
-    private String error;
-    public ApiError(String error) { this.error = error; }
-    public String getError() { return error; }
-}
-
-
-    
-

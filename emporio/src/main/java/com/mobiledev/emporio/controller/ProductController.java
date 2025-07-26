@@ -23,9 +23,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mobiledev.emporio.dto.ApiError;
 import com.mobiledev.emporio.dto.CategoryProductDto;
-import com.mobiledev.emporio.dto.DealDto;
 import com.mobiledev.emporio.dto.CreateProductRequest;
+import com.mobiledev.emporio.dto.DealDto;
 import com.mobiledev.emporio.model.Category;
 import com.mobiledev.emporio.model.Product;
 import com.mobiledev.emporio.model.Role;
@@ -200,10 +201,3 @@ public class ProductController {
         return ResponseEntity.ok("Product deleted");
     }
 }
-
-class ApiError {
-    private String error;
-    public ApiError(String error) { this.error = error; }
-    public String getError() { return error; }
-}
-

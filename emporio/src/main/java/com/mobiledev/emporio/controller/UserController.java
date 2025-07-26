@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mobiledev.emporio.dto.ApiError;
 import com.mobiledev.emporio.dto.RegisterRequest;
 import com.mobiledev.emporio.model.Role;
 import com.mobiledev.emporio.model.User;
@@ -69,10 +70,4 @@ public class UserController {
         userRepository.save(user);
         return ResponseEntity.ok("User registered successfully");
     }
-}
-
-class ApiError {
-    private String error;
-    public ApiError(String error) { this.error = error; }
-    public String getError() { return error; }
 }

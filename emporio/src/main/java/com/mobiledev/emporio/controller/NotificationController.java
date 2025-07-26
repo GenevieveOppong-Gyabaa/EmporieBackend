@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mobiledev.emporio.dto.ApiError;
 import com.mobiledev.emporio.model.Notification;
 import com.mobiledev.emporio.model.User;
 import com.mobiledev.emporio.repositories.UserRepository;
@@ -16,12 +17,7 @@ import com.mobiledev.emporio.services.NotificationService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-// Add ApiError class for error responses
-class ApiError {
-    private String error;
-    public ApiError(String error) { this.error = error; }
-    public String getError() { return error; }
-}
+
 
 @RestController
 @RequestMapping("/api/notifications")

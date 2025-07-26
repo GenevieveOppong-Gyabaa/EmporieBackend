@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mobiledev.emporio.dto.ApiError;
 import com.mobiledev.emporio.security.JwtUtil;
 import com.mobiledev.emporio.services.NotificationService;
 import com.mobiledev.emporio.services.UserService;
@@ -67,10 +68,4 @@ public class PasswordController {
         boolean success = service.resetPassword(username, body.get("token"), body.get("newPassword"));
         return ResponseEntity.ok(success ? "Password reset successful." : "Invalid token or username.");
     }
-}
-
-class ApiError {
-    private String error;
-    public ApiError(String error) { this.error = error; }
-    public String getError() { return error; }
 }

@@ -42,6 +42,17 @@ public class AuthController {
         return ResponseEntity.ok(jwt.generateToken("BUYER"));
     }
 
+    @PostMapping("/register-admin")
+    public ResponseEntity<?> registerAdmin(@Valid @RequestBody UserDTO user, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            String errorMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
+            return ResponseEntity.badRequest().body(new AuthError(errorMsg));
+        }
+        // WARNING: This should be protected in production with a secret key or admin approval
+        service.registerAdmin(user.getEmail(), user.getPassword());
+        return ResponseEntity.ok(jwt.generateToken("ADMIN"));
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody UserDTO user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mobiledev.emporio.dto.ApiError;
 import com.mobiledev.emporio.model.Order;
 import com.mobiledev.emporio.model.User;
 import com.mobiledev.emporio.repositories.OrderRepository;
@@ -48,6 +49,20 @@ public class AdminController {
         String authUsername = jwtUtil.extractUsernameFromRequest(request);
         if (!isAdmin(admin) || authUsername == null || !authUsername.equals(admin.getUsername())) return forbidden();
         return ResponseEntity.ok(userRepository.findAll());
+    }
+
+    // Promote user to admin (super admin only)
+    @PostMapping("/users/{userId}/promote-admin")
+    public ResponseEntity<?> promoteToAdmin(@RequestParam Long adminId, @PathVariable Long userId, HttpServletRequest request) {
+        User admin = userRepository.findById(adminId).orElse(null);
+        String authUsername = jwtUtil.extractUsernameFromRequest(request);
+        if (!isAdmin(admin) || authUsername == null || !authUsername.equals(admin.getUsername())) return forbidden();
+        
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) return ResponseEntity.badRequest().body("User not found");
+        user.setRole(com.mobiledev.emporio.model.Role.ADMIN);
+        userRepository.save(user);
+        return ResponseEntity.ok("User promoted to admin");
     }
 
     // Promote user to seller
@@ -134,10 +149,4 @@ public class AdminController {
         orderRepository.save(order);
         return ResponseEntity.ok("Order marked as paid");
     }
-}
-
-class ApiError {
-    private String error;
-    public ApiError(String error) { this.error = error; }
-    public String getError() { return error; }
 } 

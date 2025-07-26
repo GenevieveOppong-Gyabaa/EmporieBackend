@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mobiledev.emporio.dto.ApiError;
 import com.mobiledev.emporio.dto.SellerDashboardDto;
 import com.mobiledev.emporio.dto.SellerProductDto;
 import com.mobiledev.emporio.model.Product;
@@ -78,10 +79,4 @@ public class SellerController {
         }).collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }
-}
-
-class ApiError {
-    private String error;
-    public ApiError(String error) { this.error = error; }
-    public String getError() { return error; }
 } 

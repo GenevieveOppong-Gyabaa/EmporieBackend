@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mobiledev.emporio.dto.ApiError;
 import com.mobiledev.emporio.dto.OrderRequestDto;
 import com.mobiledev.emporio.dto.OrderStatusUpdateDTO;
 import com.mobiledev.emporio.model.Order;
@@ -78,10 +79,4 @@ public class OrderController {
         orderService.cancelOrder(orderId);
         return ResponseEntity.ok("Order cancelled");
     }
-}
-
-class ApiError {
-    private String error;
-    public ApiError(String error) { this.error = error; }
-    public String getError() { return error; }
 }

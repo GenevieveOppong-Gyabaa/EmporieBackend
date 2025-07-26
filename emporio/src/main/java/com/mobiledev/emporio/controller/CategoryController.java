@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mobiledev.emporio.dto.ApiError;
 import com.mobiledev.emporio.model.Category;
 import com.mobiledev.emporio.model.User;
 import com.mobiledev.emporio.repositories.CategoryRepository;
@@ -53,10 +54,4 @@ public class CategoryController {
     public Category getCategory(@PathVariable Long id) {
         return categoryRepository.findById(id).orElse(null);
     }
-}
-
-class ApiError {
-    private String error;
-    public ApiError(String error) { this.error = error; }
-    public String getError() { return error; }
 } 

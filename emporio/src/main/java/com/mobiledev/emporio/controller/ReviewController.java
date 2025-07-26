@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mobiledev.emporio.dto.ApiError;
 import com.mobiledev.emporio.dto.ReviewRequest;
 import com.mobiledev.emporio.dto.ReviewResponse;
 import com.mobiledev.emporio.model.User;
@@ -87,10 +88,4 @@ public class ReviewController {
         ReviewResponse resp = reviewService.rejectReview(reviewId);
         return resp != null ? ResponseEntity.ok(resp) : ResponseEntity.badRequest().body("Review not found");
     }
-}
-
-class ApiError {
-    private String error;
-    public ApiError(String error) { this.error = error; }
-    public String getError() { return error; }
 } 
