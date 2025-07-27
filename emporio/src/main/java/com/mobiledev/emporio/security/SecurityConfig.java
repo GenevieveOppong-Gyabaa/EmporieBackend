@@ -34,9 +34,14 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/products/**").permitAll()  // Allow public access to products
+                .requestMatchers("/products").permitAll()  // Allow public GET access to products
+                .requestMatchers("/products/deals").permitAll()  // Allow public access to deals
+                .requestMatchers("/products/by-category/**").permitAll()  // Allow public access to category products
+                .requestMatchers("/products/by-tag").permitAll()  // Allow public access to tag products
+                .requestMatchers("/products/{productId}").permitAll()  // Allow public GET access to product details
                 .requestMatchers("/categories/**").permitAll() // Allow public access to categories
                 .requestMatchers("/").permitAll()  // Allow root endpoint
+                .requestMatchers("/api/orders/**").authenticated() // Require auth for orders
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

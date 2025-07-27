@@ -1,5 +1,7 @@
 package com.mobiledev.emporio.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mobiledev.emporio.dto.ApiError;
 import com.mobiledev.emporio.dto.OrderRequestDto;
+import com.mobiledev.emporio.dto.OrderResponseDto;
 import com.mobiledev.emporio.dto.OrderStatusUpdateDTO;
 import com.mobiledev.emporio.model.Order;
 import com.mobiledev.emporio.model.User;
@@ -24,7 +27,7 @@ import com.mobiledev.emporio.services.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 public class OrderController {
     private final OrderService orderService;
     @Autowired
@@ -40,6 +43,19 @@ public class OrderController {
     public ResponseEntity<?> placeOrder(@RequestBody OrderRequestDto orderDTO){
         Order order = orderService.placeOrder(orderDTO);
         return ResponseEntity.ok(order);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getCurrentUserOrders(HttpServletRequest request) {
+        String authUsername = jwtUtil.extractUsernameFromRequest(request);
+        if (authUsername == null) {
+            return ResponseEntity.status(401).body(new ApiError("Authentication required"));
+        }
+        List<Order> orders = orderService.getOrdersByBuyer(authUsername);
+        List<OrderResponseDto> orderDtos = orders.stream()
+            .map(OrderResponseDto::new)
+            .collect(java.util.stream.Collectors.toList());
+        return ResponseEntity.ok(orderDtos);
     }
     @GetMapping("/buyer/{username}")
     public ResponseEntity<?> getOrdersByBuyer(@PathVariable String username, HttpServletRequest request) {

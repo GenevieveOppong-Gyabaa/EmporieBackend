@@ -25,23 +25,25 @@ public class UserService {
         this.repo = repo;
     }
 
-    public void register(String username, String password) {
-        if (repo.findByUsername(username) != null) {
-            throw new RuntimeException("Username already taken");
+    public void register(String email, String password) {
+        if (repo.findByEmail(email) != null) {
+            throw new RuntimeException("Email already taken");
         }
         User user = new User();
-        user.setUsername(username);
+        user.setUsername(email); // Use email as username for now
+        user.setEmail(email);    // Set the email field properly
         user.setPassword(encoder.encode(password));
-        user.setRole(Role.BUYER); // Always assign BUYER role
+        user.setRole(Role.SELLER); // Always assign SELLER role
         repo.save(user);
     }
 
-    public void registerAdmin(String username, String password) {
-        if (repo.findByUsername(username) != null) {
-            throw new RuntimeException("Username already taken");
+    public void registerAdmin(String email, String password) {
+        if (repo.findByEmail(email) != null) {
+            throw new RuntimeException("Email already taken");
         }
         User user = new User();
-        user.setUsername(username);
+        user.setUsername(email); // Use email as username for now
+        user.setEmail(email);    // Set the email field properly
         user.setPassword(encoder.encode(password));
         user.setRole(Role.ADMIN); // Assign ADMIN role
         repo.save(user);
@@ -64,29 +66,47 @@ public class UserService {
         return false;
     }
 
-    public String createResetToken(String username) {
-        User user = repo.findByUsername(username);
+    public String createResetToken(String email) {
+        User user = repo.findByEmail(email);
         if (user == null) return null;
         String token = UUID.randomUUID().toString();
-        resetTokens.put(username, token);
+        resetTokens.put(email, token);
         notificationService.createNotification(user, "Password Reset Requested", "A password reset was requested for your account.");
-        notificationService.sendPasswordReset(user.getUsername(), token);
+        notificationService.sendPasswordReset(user.getEmail(), token);
         return token;
     }
 
-    public boolean resetPassword(String username, String token, String newPassword) {
-        String validToken = resetTokens.get(username);
+    public boolean resetPassword(String email, String token, String newPassword) {
+        String validToken = resetTokens.get(email);
         if (validToken != null && validToken.equals(token)) {
-            User user = repo.findByUsername(username);
+            User user = repo.findByEmail(email);
             user.setPassword(encoder.encode(newPassword));
             repo.save(user);
-            resetTokens.remove(username);
+            resetTokens.remove(email);
             notificationService.createNotification(user, "Password Reset Successful", "Your password was reset successfully.");
             // Optionally, send email notification for password reset success
             return true;
         }
         return false;
     }
+
+    public void promoteToSeller(String email) {
+        User user = repo.findByEmail(email);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        if (user.getRole() == Role.SELLER) {
+            throw new RuntimeException("User is already a seller");
+        }
+        user.setRole(Role.SELLER);
+        repo.save(user);
+        // No notification - silent promotion to seller
+    }
+
+    public User getUserByEmail(String email) {
+        return repo.findByEmail(email);
+    }
+
     // public User findByUsername(String username) {
        
 
