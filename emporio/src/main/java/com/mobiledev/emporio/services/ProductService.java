@@ -84,8 +84,8 @@ public class ProductService {
         dto.setId(product.getId());
         dto.setTitle(product.getName());
         dto.setDescription(product.getDescription());
-        dto.setOriginalPrice(product.getPrice() != null ? String.format("$%.2f", product.getPrice()) : null);
-        dto.setSalePrice(product.getDiscountPrice() != null ? String.format("$%.2f", product.getDiscountPrice()) : null);
+        dto.setOriginalPrice(product.getPrice() != null ? String.format("₵%.2f", product.getPrice()) : null);
+        dto.setSalePrice(product.getDiscountPrice() != null ? String.format("₵%.2f", product.getDiscountPrice()) : null);
         dto.setDiscount(product.getDiscountPercent() != null ? String.format("%.0f%%", product.getDiscountPercent()) : null);
         dto.setCategory(product.getCategory() != null ? product.getCategory().getName() : null);
         dto.setInStock(product.getStock() != null && product.getStock() > 0);

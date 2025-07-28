@@ -102,8 +102,8 @@ public class ProductController {
                 dto.setId(product.getId());
                 dto.setName(product.getName());
                 dto.setImage(product.getImageUrls() != null && !product.getImageUrls().isEmpty() ? product.getImageUrls().get(0) : null);
-                dto.setPrice(product.getPrice() != null ? String.format("$%.2f", product.getPrice()) : null);
-                dto.setDiscountPrice(product.getDiscountPrice() != null ? String.format("$%.2f", product.getDiscountPrice()) : null);
+                dto.setPrice(product.getPrice() != null ? String.format("₵%.2f", product.getPrice()) : null);
+                dto.setDiscountPrice(product.getDiscountPrice() != null ? String.format("₵%.2f", product.getDiscountPrice()) : null);
                 dto.setDescription(product.getDescription());
                 dto.setInStock(product.getStock() != null && product.getStock() > 0);
                 return dto;
