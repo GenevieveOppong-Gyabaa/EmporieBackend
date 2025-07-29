@@ -72,10 +72,10 @@ public class SellerController {
         Page<Product> productPage = productRepository.findBySeller(seller, pageable);
         List<Product> products = productPage.getContent();
         List<SellerProductDto> dtos = products.stream().map(product -> {
-            int views = 0; // If you have a views field, use product.getViews()
+            int views = product.getViews(); // Use the actual views field from Product
             long carts = cartItemRepository.countByProductIn(List.of(product));
             long sold = orderItemRepository.countByProductIn(List.of(product));
-            return new SellerProductDto(product.getId(), product.getName(), views, carts, sold);
+            return new SellerProductDto(product.getId(), product.getName(), views, carts, sold, product.getPrice());
         }).collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }

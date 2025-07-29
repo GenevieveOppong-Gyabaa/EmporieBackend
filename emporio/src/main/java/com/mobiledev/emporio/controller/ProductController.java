@@ -63,6 +63,30 @@ public class ProductController {
         return productService.getDealDtos();
     }
 
+    @GetMapping("/trending")
+    public ResponseEntity<?> getTrendingPicks(HttpServletRequest request) {
+        try {
+            String authUsername = jwtUtil.extractUsernameFromRequest(request);
+            User currentUser = null;
+            
+            if (authUsername != null) {
+                currentUser = userRepository.findByEmail(authUsername);
+            }
+            
+            List<Product> allProducts = productRepository.findAll();
+            
+            // Filter out products created by the current user
+            final User finalCurrentUser = currentUser;
+            List<Product> trendingProducts = allProducts.stream()
+                .filter(product -> finalCurrentUser == null || !finalCurrentUser.getId().equals(product.getSeller().getId()))
+                .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(trendingProducts);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new ApiError("Failed to fetch trending picks"));
+        }
+    }
+
     @PostMapping("/{productId}/upload-images")
     public ResponseEntity<?> uploadProductImages(@PathVariable Long productId, @RequestParam Long userId, @RequestParam("images") List<MultipartFile> images) {
         User user = userRepository.findById(userId).orElse(null);
