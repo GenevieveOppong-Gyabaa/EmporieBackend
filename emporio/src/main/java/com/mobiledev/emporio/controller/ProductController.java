@@ -88,28 +88,13 @@ public class ProductController {
     }
 
     @PostMapping("/{productId}/upload-images")
-    public ResponseEntity<?> uploadProductImages(@PathVariable Long productId, @RequestParam Long userId, @RequestParam("images") List<MultipartFile> images) {
+    public ResponseEntity<?> uploadProductImages(@PathVariable Long productId, @RequestParam Long userId, @RequestBody List<String> imageUrls) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null || user.getRole() != Role.SELLER) {
             return ResponseEntity.status(403).body("Only sellers can upload product images.");
         }
         Product product = productRepository.findById(productId).orElse(null);
         if (product == null) return ResponseEntity.badRequest().body("Product not found");
-        List<String> imageUrls = product.getImageUrls() != null ? new ArrayList<>(product.getImageUrls()) : new ArrayList<>();
-        String uploadDir = "src/main/resources/static/uploads/";
-        for (MultipartFile image : images) {
-            if (image.isEmpty()) continue;
-            String filename = System.currentTimeMillis() + "_" + StringUtils.cleanPath(image.getOriginalFilename());
-            Path filePath = Paths.get(uploadDir, filename);
-            try {
-                Files.createDirectories(filePath.getParent());
-                Files.copy(image.getInputStream(), filePath);
-                String url = "/uploads/" + filename;
-                imageUrls.add(url);
-            } catch (IOException e) {
-                return ResponseEntity.status(500).body("Failed to upload image: " + filename);
-            }
-        }
         product.setImageUrls(imageUrls);
         productRepository.save(product);
         return ResponseEntity.ok(imageUrls);
